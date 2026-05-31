@@ -1,4 +1,5 @@
 import sqlite3
+
 class Cliente:
     def __init__(self, ID=None, Nome=None):
         self.ID = ID
