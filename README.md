@@ -4,9 +4,9 @@ Vendaki é um aplicativo que identifica musicas através de aos audios e permite
 
 ## Funcionalidades
 
-- [ ] Desktop
-  - [ ] Autenticação e Tela de Login
-  - [ ] Criar CRUD e Telas de Cliente,Venda,Carro e Categoria
+- [x] Desktop
+  - [x] Autenticação e Tela de Login
+  - [x] Criar CRUD e Telas de Cliente,Venda,Carro e Categoria
 
 ## Tecnologias
 
