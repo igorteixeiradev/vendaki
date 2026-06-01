@@ -6,7 +6,7 @@ class Database:
 
     def conectar(self):
         try:
-            self.conn = sqlite3.connect("./db/VendaProdutos.db")
+            self.conn = sqlite3.connect("./db/HinginoRafael.db")
             return self.conn
         except sqlite3.Error as e:
             print(f"Erro ao conectar ao banco de dados: {e}")
@@ -16,111 +16,141 @@ class Database:
         cursor = self.conn.cursor()
 
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS categoria (
+            CREATE TABLE IF NOT EXISTS utilizadores (
                 ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                Nome TEXT NOT NULL UNIQUE
+                Usuario TEXT NOT NULL UNIQUE,
+                Senha TEXT NOT NULL,
+                NomeCompleto TEXT,
+                Cargo TEXT DEFAULT 'Vendedor'
             )
         """)
 
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS produtos (
+            CREATE TABLE IF NOT EXISTS categoria_carros (
                 ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                Nome TEXT NOT NULL,
-                Preco REAL NOT NULL,
+                Nome TEXT NOT NULL UNIQUE,
+                Descricao TEXT
+            )
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS carros (
+                ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                Marca TEXT NOT NULL,
+                Modelo TEXT NOT NULL,
+                Ano INTEGER NOT NULL,
+                Cor TEXT,
+                Combustivel TEXT,
+                Transmissao TEXT,
+                Quilometragem INTEGER DEFAULT 0,
+                NumChassi TEXT UNIQUE,
+                NumMotor TEXT,
+                PrecoVenda REAL NOT NULL,
                 IDCategoria INTEGER,
-                Stock INTEGER NOT NULL DEFAULT 0,
-                FOREIGN KEY (IDCategoria) REFERENCES categoria(ID)
+                Estado TEXT DEFAULT 'Disponivel',
+                DataEntrada TEXT DEFAULT (date('now','localtime')),
+                Observacoes TEXT,
+                FOREIGN KEY (IDCategoria) REFERENCES categoria_carros(ID)
             )
         """)
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS clientes (
                 ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                Nome TEXT NOT NULL
+                Nome TEXT NOT NULL,
+                Telefone TEXT,
+                Email TEXT,
+                Endereco TEXT,
+                BI TEXT UNIQUE,
+                DataCadastro TEXT DEFAULT (date('now','localtime'))
             )
         """)
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS vendas (
                 ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                Preco REAL NOT NULL,
-                IDCliente INTEGER,
-                IDProduto INTEGER,
-                Qt INTEGER NOT NULL,
-                DataHora TEXT NOT NULL DEFAULT (datetime('now','localtime')),
+                IDCarro INTEGER NOT NULL,
+                IDCliente INTEGER NOT NULL,
+                PrecoVenda REAL NOT NULL,
+                Desconto REAL DEFAULT 0,
+                PrecoFinal REAL NOT NULL,
+                FormaPagamento TEXT DEFAULT 'Dinheiro',
+                DataVenda TEXT DEFAULT (datetime('now','localtime')),
+                IDVendedor INTEGER,
+                Observacoes TEXT,
+                FOREIGN KEY (IDCarro) REFERENCES carros(ID),
                 FOREIGN KEY (IDCliente) REFERENCES clientes(ID),
-                FOREIGN KEY (IDProduto) REFERENCES produtos(ID)
+                FOREIGN KEY (IDVendedor) REFERENCES utilizadores(ID)
             )
         """)
-
-        try:
-            cursor.execute("ALTER TABLE produtos ADD COLUMN Stock INTEGER NOT NULL DEFAULT 0")
-        except sqlite3.OperationalError:
-            pass
-        try:
-            cursor.execute("ALTER TABLE vendas ADD COLUMN DataHora TEXT NOT NULL DEFAULT (datetime('now','localtime'))")
-        except sqlite3.OperationalError:
-            pass
 
         self.conn.commit()
 
     def inserir_dados_iniciais(self):
         cursor = self.conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM categoria")
-        if cursor.fetchone()[0] > 0:
-            return
 
-        categorias = ["Limpeza", "Alimentação", "Electronicos", "Bebidas", "Higiene Pessoal", "Lacticinios", "Cereais e Graos"]
-        for cat in categorias:
-            cursor.execute("INSERT OR IGNORE INTO categoria (Nome) VALUES (?)", (cat,))
-
-        clientes = ["Carlos Teixeira", "Ana Rodrigues", "Manuel da Silva", "Fatima Neto", "Paulo Goncalves"]
-        for cli in clientes:
-            cursor.execute("INSERT OR IGNORE INTO clientes (Nome) VALUES (?)", (cli,))
-
-        produtos = [
-            ("Detergente Ariel 3kg",        2500.00, 1, 40),
-            ("Lixivia Brimax 2L",            800.00,  1, 60),
-            ("Desinfetante Dettol 1L",       1200.00, 1, 35),
-            ("Esponja Scotch-Brite pack 3",  450.00,  1, 80),
-            ("Sabão em Po Omo 2kg",          1800.00, 1, 45),
-            ("Arroz Angoriano 5kg",          1500.00, 2, 100),
-            ("Feijao Frade 1kg",             600.00,  2, 90),
-            ("Oléo de Palma 5L",             2200.00, 2, 50),
-            ("Massa Esparguete 500g",        350.00,  2, 120),
-            ("Farinha de Trigo 1kg",         400.00,  2, 80),
-            ("Açucar Refinado 1kg",          500.00,  2, 100),
-            ("Sal Grosso 1kg",               200.00,  2, 150),
-            ("Tomate em Lata 400g",          350.00,  2, 70),
-            ("Sardinha em Lata Tricana",     450.00,  2, 60),
-            ("Frango Inteiro 1.5kg",         3500.00, 2, 30),
-            ("Televisão Samsung 43pol",   250000.00, 3, 5),
-            ("Frigorifico Hisense 150L",  180000.00, 3, 4),
-            ("Ventoinha de Mesa",          8500.00,  3, 20),
-            ("Ferro de Engomar Philips",   12000.00, 3, 15),
-            ("Carregador USB Tipo-C",       2500.00, 3, 40),
-            ("Água Caxito 6x1.5L",          900.00,  4, 80),
-            ("Sumo Sumol Laranja 330ml",    400.00,  4, 100),
-            ("Coca-Cola 2L",                900.00,  4, 60),
-            ("Cerveja Cuca 6x330ml",       2200.00,  4, 50),
-            ("Leite Mimosa 1L",             850.00,  4, 70),
-            ("Sabonete Palmolive pack 3",   600.00,  5, 90),
-            ("Shampoo Head Shoulders 400ml",1800.00, 5, 40),
-            ("Pasta Dentifria Colgate 75ml", 700.00, 5, 60),
-            ("Desodorizante Rexona 150ml",  1200.00, 5, 45),
-            ("Papel Higienico Renova 12un", 1500.00, 5, 55),
-            ("Queijo Fresco 250g",          1200.00, 6, 30),
-            ("Iogurte Natural Mimosa 4un",   950.00, 6, 40),
-            ("Manteiga Planta 250g",        1100.00, 6, 35),
-            ("Fuba de Milho 2kg",            700.00, 7, 80),
-            ("Aveia Quaker 500g",           1300.00, 7, 45),
-            ("Lentilhas 500g",               550.00, 7, 60),
-        ]
-        for prod in produtos:
+        # Utilizador admin padrão
+        cursor.execute("SELECT COUNT(*) FROM utilizadores")
+        if cursor.fetchone()[0] == 0:
             cursor.execute(
-                "INSERT OR IGNORE INTO produtos (Nome, Preco, IDCategoria, Stock) VALUES (?, ?, ?, ?)",
-                prod,
+                "INSERT INTO utilizadores (Usuario, Senha, NomeCompleto, Cargo) VALUES (?, ?, ?, ?)",
+                ("admin", "admin123", "Administrador", "Administrador")
             )
+            cursor.execute(
+                "INSERT INTO utilizadores (Usuario, Senha, NomeCompleto, Cargo) VALUES (?, ?, ?, ?)",
+                ("vendedor", "venda123", "João Vendedor", "Vendedor")
+            )
+
+        # Categorias de carros
+        cursor.execute("SELECT COUNT(*) FROM categoria_carros")
+        if cursor.fetchone()[0] == 0:
+            categorias = [
+                ("Sedan", "Carros de 4 portas com porta-malas separado"),
+                ("SUV", "Sport Utility Vehicle - veículos utilitários"),
+                ("Pickup", "Camionetes de carga e uso misto"),
+                ("Hatchback", "Carros compactos com porta traseira integrada"),
+                ("Minivan", "Veículos de grande capacidade para famílias"),
+                ("Coupe", "Carros esportivos de 2 portas"),
+                ("Cabrio", "Carros descapotáveis"),
+                ("Furgão / Comercial", "Veículos para uso comercial e de carga"),
+            ]
+            for nome, desc in categorias:
+                cursor.execute("INSERT OR IGNORE INTO categoria_carros (Nome, Descricao) VALUES (?, ?)", (nome, desc))
+
+        # Clientes iniciais
+        cursor.execute("SELECT COUNT(*) FROM clientes")
+        if cursor.fetchone()[0] == 0:
+            clientes = [
+                ("Carlos Mbemba", "923 456 789", "carlos@gmail.com", "Rua do Carmo, 45, Luanda", "004523789LA"),
+                ("Ana Loureiro", "912 345 678", "ana.loureiro@hotmail.com", "Av. Lenin, 102, Luanda", "005123456LA"),
+                ("Manuel Simões", "935 678 901", "", "Bairro Rangel, Luanda", "006789012LA"),
+                ("Fátima Neto", "924 567 890", "fatima.neto@gmail.com", "Luanda Sul, Talatona", "007890123LA"),
+                ("Paulo Gonçalves", "945 012 345", "", "Município de Viana", "008901234LA"),
+            ]
+            for c in clientes:
+                cursor.execute(
+                    "INSERT OR IGNORE INTO clientes (Nome, Telefone, Email, Endereco, BI) VALUES (?,?,?,?,?)", c
+                )
+
+        # Carros iniciais
+        cursor.execute("SELECT COUNT(*) FROM carros")
+        if cursor.fetchone()[0] == 0:
+            carros = [
+                ("Toyota", "Corolla", 2020, "Branco", "Gasolina", "Automático", 45000, "CH100001", "MT10001", 12500000.0, 1, "Disponivel", ""),
+                ("Toyota", "Hilux", 2021, "Preto", "Diesel", "Manual", 32000, "CH100002", "MT10002", 18000000.0, 3, "Disponivel", ""),
+                ("Honda", "Civic", 2019, "Cinzento", "Gasolina", "Automático", 67000, "CH100003", "MT10003", 10800000.0, 1, "Disponivel", ""),
+                ("Mitsubishi", "Outlander", 2022, "Azul", "Gasolina", "Automático", 18000, "CH100004", "MT10004", 22000000.0, 2, "Disponivel", ""),
+                ("Ford", "Ranger", 2021, "Vermelho", "Diesel", "Manual", 28000, "CH100005", "MT10005", 19500000.0, 3, "Disponivel", ""),
+                ("Volkswagen", "Golf", 2018, "Branco", "Gasolina", "Manual", 80000, "CH100006", "MT10006", 9200000.0, 4, "Disponivel", ""),
+                ("Hyundai", "Tucson", 2023, "Prata", "Gasolina", "Automático", 5000, "CH100007", "MT10007", 25000000.0, 2, "Disponivel", ""),
+                ("Nissan", "Frontier", 2020, "Preto", "Diesel", "Automático", 52000, "CH100008", "MT10008", 17000000.0, 3, "Disponivel", ""),
+                ("BMW", "Série 3", 2019, "Preto", "Gasolina", "Automático", 61000, "CH100009", "MT10009", 28000000.0, 6, "Disponivel", ""),
+                ("Mercedes-Benz", "C200", 2021, "Branco", "Gasolina", "Automático", 22000, "CH100010", "MT10010", 35000000.0, 1, "Disponivel", ""),
+            ]
+            for c in carros:
+                cursor.execute(
+                    "INSERT OR IGNORE INTO carros (Marca, Modelo, Ano, Cor, Combustivel, Transmissao, Quilometragem, NumChassi, NumMotor, PrecoVenda, IDCategoria, Estado, Observacoes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", c
+                )
 
         self.conn.commit()
 
