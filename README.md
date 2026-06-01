@@ -1,6 +1,6 @@
 # Vendaki
 
-Vendaki é um aplicativo que identifica musicas através de aos audios e permite baixar a música encontrada.
+Vendaki é um aplicativo que gestão de stand de carros.
 
 ## Funcionalidades
 
