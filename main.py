@@ -11,7 +11,7 @@ from src.Venda import Venda
 class HinginoRafaelApp:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("Hingino-Rafael — Sistema de Gestão de Stand de Carros")
+        self.root.title("VENDAKI — Sistema de Gestão de Stand de Carros")
         self.root.geometry("1200x750")
         self.root.resizable(True, True)
 
@@ -101,7 +101,7 @@ class HinginoRafaelApp:
 
         tk.Label(
             barra,
-            text="⬡ HINGINO-RAFAEL",
+            text="⬡ VENDAKI",
             font=("Segoe UI", 13, "bold"),
             bg=self.COR_PAINEL,
             fg=self.COR_OURO,
@@ -301,7 +301,7 @@ class HinginoRafaelApp:
         ).pack(pady=(80, 0))
         tk.Label(
             esq,
-            text="HINGINO-RAFAEL",
+            text="VENDAKI",
             font=("Georgia", 22, "bold"),
             bg=self.COR_PAINEL,
             fg=self.COR_OURO,
