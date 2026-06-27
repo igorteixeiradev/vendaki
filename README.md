@@ -1,44 +1,44 @@
 # Vendaki
 
-Vendaki é um aplicativo que gestão de stand de carros.
+Vendaki is a desktop system developed in Python for the complete management of car dealerships.
 
-## Funcionalidades
+## Features
 
 - [x] Desktop
-  - [x] Autenticação e Tela de Login
-  - [x] Criar CRUD e Telas de Cliente,Venda,Carro e Categoria
+  - [x] Authentication and Login Screen
+  - [x] Full CRUD and Interface Screens for Clients, Sales, Cars, and Categories
 
-## Tecnologias
+## Technologies
 
 - Python
 - Tkinter
 - SQLite
 
-## Instalação
+## Installation
 
 ```bash
-# Clonar o repositório
+# Clone the repository
 git clone https://github.com/igorteixeiradev/vendaki.git
 
-# Entrar no diretório
+# Enter the directory
 cd vendaki
 
-# Rodar o projeto
+# Run the project
 python main.py
 ```
 
 ## Screenshots
 
 <p align="center">
-  <img src="/assets/Screenshot.png" alt="Recarregaaki" width="1200" />
+  <img src="/assets/Screenshot.png" alt="Reload here" width="1200" />
 </p>
 
-## Licença
+## License
 
-Este projeto tem licensa MIT.
+This project is licensed under the MIT License.
 
 ---
 
-**Autor**
+**Author**
 
 - GitHub: [@igorteixeiradev](https://github.com/igorteixeiradev)
